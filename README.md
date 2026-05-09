@@ -1,1 +1,1 @@
-# Abordagem-em-duas-fases-para-detec-o-e-classifica-o-de-ataques-em-redes-IoT-com-computa-o-em-n-voa
+# Materiais complementares da IC sobre detecção e classificação de ataques em redes IoT com computação em névoa usando uma abordagem em duas fases.

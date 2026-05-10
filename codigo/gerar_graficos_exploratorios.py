@@ -9,6 +9,7 @@ hierarquico sobre o mesmo embedding usado no fluxo do artigo.
 from __future__ import annotations
 
 import argparse
+import gc
 import os
 from pathlib import Path
 
@@ -308,6 +309,35 @@ def select_best_rows(kmeans_df: pd.DataFrame, dbscan_df: pd.DataFrame, hierarchi
     return out
 
 
+def load_metric_tables(output_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    paths = {
+        "KMeans": output_dir / "metricas_kmeans.csv",
+        "DBSCAN": output_dir / "metricas_dbscan.csv",
+        "Hierarquico": output_dir / "metricas_hierarquico.csv",
+    }
+    missing = [name for name, path in paths.items() if not path.exists()]
+    if missing:
+        raise FileNotFoundError(
+            "Não foi possível gerar o comparativo porque faltam tabelas de métricas: "
+            + ", ".join(missing)
+            + ". Execute antes as etapas kmeans, dbscan e hierarquico."
+        )
+    return (
+        pd.read_csv(paths["KMeans"]),
+        pd.read_csv(paths["DBSCAN"]),
+        pd.read_csv(paths["Hierarquico"]),
+    )
+
+
+def make_comparison_from_existing(output_dir: Path, figures_dir: Path) -> pd.DataFrame:
+    kmeans_df, dbscan_df, hierarchical_df = load_metric_tables(output_dir)
+    best_df = select_best_rows(kmeans_df, dbscan_df, hierarchical_df)
+    best_df.to_csv(output_dir / "comparativo_melhores_configuracoes.csv", index=False)
+    plot_algorithm_comparison(best_df, figures_dir)
+    plot_algorithm_performance_panel(best_df, figures_dir)
+    return best_df
+
+
 def plot_kmeans_curves(kmeans_df: pd.DataFrame, output_dir: Path) -> None:
     mk = kmeans_df.sort_values("k")
     specs = [
@@ -440,29 +470,60 @@ def main() -> None:
     parser.add_argument("--max-sample", type=int, default=8000)
     parser.add_argument("--k-min", type=int, default=2)
     parser.add_argument("--k-max", type=int, default=60)
+    parser.add_argument(
+        "--algorithms",
+        nargs="+",
+        default=["all"],
+        choices=["all", "kmeans", "dbscan", "hierarquico", "comparativo", "svd"],
+        help=(
+            "Etapas a executar. Use chamadas separadas no Colab para reduzir memória, "
+            "por exemplo: --algorithms kmeans; depois dbscan; depois hierarquico; "
+            "por fim comparativo."
+        ),
+    )
     args = parser.parse_args()
 
     output_dir = ensure_dir(args.output_dir)
     figures_dir = ensure_dir(args.figures_dir) if args.figures_dir else ensure_dir(output_dir / "graficos")
 
-    df = load_prepare_input(args.data_path)
-    embedding, y_type, y_label = make_embedding(df, max_sample=args.max_sample, seed=RSEED)
+    requested = set(args.algorithms)
+    if "all" in requested:
+        requested = {"kmeans", "dbscan", "hierarquico", "comparativo", "svd"}
 
-    kmeans_df = sweep_kmeans(embedding, y_type, y_label, args.k_min, args.k_max)
-    dbscan_df = sweep_dbscan(embedding, y_type, y_label)
-    hierarchical_df = sweep_hierarchical(embedding, y_type, y_label)
-    best_df = select_best_rows(kmeans_df, dbscan_df, hierarchical_df)
+    needs_embedding = bool(requested & {"kmeans", "dbscan", "hierarquico", "svd"})
+    if needs_embedding:
+        df = load_prepare_input(args.data_path)
+        embedding, y_type, y_label = make_embedding(df, max_sample=args.max_sample, seed=RSEED)
+    else:
+        df = None
+        embedding = y_type = y_label = None
 
-    kmeans_df.to_csv(output_dir / "metricas_kmeans.csv", index=False)
-    dbscan_df.to_csv(output_dir / "metricas_dbscan.csv", index=False)
-    hierarchical_df.to_csv(output_dir / "metricas_hierarquico.csv", index=False)
-    best_df.to_csv(output_dir / "comparativo_melhores_configuracoes.csv", index=False)
+    if "kmeans" in requested:
+        kmeans_df = sweep_kmeans(embedding, y_type, y_label, args.k_min, args.k_max)
+        kmeans_df.to_csv(output_dir / "metricas_kmeans.csv", index=False)
+        plot_kmeans_curves(kmeans_df, figures_dir)
+        del kmeans_df
+        gc.collect()
 
-    plot_kmeans_curves(kmeans_df, figures_dir)
-    plot_algorithm_comparison(best_df, figures_dir)
-    plot_algorithm_performance_panel(best_df, figures_dir)
-    plot_svd_2d_projection(embedding, y_type, figures_dir)
-    plot_cluster_type_heatmap_from_kmeans(df, figures_dir)
+    if "dbscan" in requested:
+        dbscan_df = sweep_dbscan(embedding, y_type, y_label)
+        dbscan_df.to_csv(output_dir / "metricas_dbscan.csv", index=False)
+        del dbscan_df
+        gc.collect()
+
+    if "hierarquico" in requested:
+        hierarchical_df = sweep_hierarchical(embedding, y_type, y_label)
+        hierarchical_df.to_csv(output_dir / "metricas_hierarquico.csv", index=False)
+        del hierarchical_df
+        gc.collect()
+
+    if "svd" in requested:
+        plot_svd_2d_projection(embedding, y_type, figures_dir)
+        if df is not None:
+            plot_cluster_type_heatmap_from_kmeans(df, figures_dir)
+
+    if "comparativo" in requested:
+        make_comparison_from_existing(output_dir, figures_dir)
 
     print("Arquivos salvos em:", os.path.abspath(output_dir))
 

@@ -1,0 +1,7 @@
+*.md text eol=lf
+*.csv text eol=lf
+*.ipynb text eol=lf
+*.py text eol=lf
+requirements.txt text eol=lf
+*.parquet binary
+*.png binary

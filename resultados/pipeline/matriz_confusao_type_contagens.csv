@@ -1,0 +1,11 @@
+,backdoor,ddos,dos,injection,mitm,normal,password,ransomware,scanning,xss
+backdoor,74,0,0,0,0,0,0,0,0,0
+ddos,0,78,0,0,0,0,0,0,0,0
+dos,0,0,134,0,0,0,0,0,0,0
+injection,0,1,9,40,0,0,1,0,0,0
+mitm,3,0,0,0,79,0,0,0,0,0
+normal,0,0,0,0,0,2438,0,0,0,0
+password,0,4,5,0,12,0,111,0,6,0
+ransomware,0,0,0,0,0,7,0,71,0,0
+scanning,0,0,0,0,0,0,1,0,3158,5
+xss,0,0,0,0,0,0,0,0,0,4747

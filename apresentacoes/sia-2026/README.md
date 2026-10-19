@@ -1,9 +1,9 @@
-# SIA 2026 — Painel
+# SIA 2026 — apresentação em painel
 
-**Trabalho 24615:** Arquitetura híbrida para detecção de tráfego malicioso em ambientes IoT.
+A documentação e os materiais do **trabalho 24615** passaram a ter um **repositório próprio**:
 
-**Modalidade:** Pesquisa — Graduação. **ODS:** 9. **Bolsa:** PIBIC/CNPq.
+**[SIA 2026 — Arquitetura híbrida para detecção de tráfego malicioso em ambientes IoT](https://github.com/Math-BUG/sia-2026-iot-ids)**
 
-Arquivos previstos: `painel.pdf` e `painel-editavel.pptx`, após revisão final.
+Este repositório SBCUP continua sendo a fonte dos notebooks, datasets processados, métricas, matrizes e gráficos originais. Evitar manter cópias adicionais do painel aqui.
 
-Não inserir no repositório público versões de relatórios com assinaturas, dados pessoais ou documentos cadastrais.
+Status dos arquivos PDF/PPTX de apresentação: consultar o README e o checklist do repositório SIA.

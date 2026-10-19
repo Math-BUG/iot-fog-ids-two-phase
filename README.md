@@ -75,3 +75,25 @@ Ordem recomendada de execução:
 - Os arquivos em `dados/`, `resultados/` e `gráficos/` são artefatos do experimento e podem ser grandes.
 - Os caminhos dos notebooks apontam para o ambiente do Colab; ao executar localmente, adapte os diretórios de entrada e saída.
 - A pasta `gráficos/` mantém o nome em português para preservar a organização original dos artefatos já gerados.
+
+
+## Publicações e apresentações da IC
+
+- [Organização da publicação SBCUP 2026](publicacoes/sbcup-2026/README.md) — artigo, fontes e documentação de publicação (PDF a adicionar nesta pasta).
+- [Painel do SIA 2026](apresentacoes/sia-2026/README.md) — **Arquitetura híbrida para detecção de tráfego malicioso em ambientes IoT** (PDF e PowerPoint revisados a adicionar).
+- [Índice dos materiais da IC](docs/ORGANIZACAO_DA_IC.md).
+
+### Algumas figuras já disponíveis
+
+- [Matriz de confusão de `cluster_kmeans30`](gráficos/pipeline/matriz_confusao_cluster_kmeans30.png)
+- [Matriz de confusão de `type`](gráficos/pipeline/matriz_confusao_type.png)
+- [Heatmap de tipos de ataque por cluster](gráficos/pipeline/kmeans30_heatmap_type_por_cluster.png)
+- [Pureza por cluster](gráficos/pipeline/kmeans30_pureza_por_cluster.png)
+- [F1 por classe de ataque](gráficos/pipeline/f1_por_classe_type.png)
+
+### Projetos relacionados
+
+- [ERAD-SE 2026 — desempenho CPU/GPU](https://github.com/Math-BUG/experimento_erad)
+- [Pesquisa de generalização e avaliação em maior escala](https://github.com/Math-BUG/ids_generalization_pipeline)
+
+O relatório final assinado da IC não é disponibilizado nos repositórios públicos.
